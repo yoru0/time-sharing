@@ -48,6 +48,15 @@ int main() {
         }
     }
     
+    signal(SIGALRM, timer_handler);
 
+    printf("\n[Scheduler] Starting task 0\n");
+    alarm(TIME_SLICE);
+
+    // parent process waits for all children
+    for (int i = 0; i < NUM_TASK; i++) {
+        waitpid(tasks[i], NULL, 0);
+    }
+    
     return 0;
 }
