@@ -90,3 +90,51 @@ void do_work(int pid) {
         }
     }
 }
+
+int all_done() {
+    for (int i = 0; i < num_procs; i++)
+        if (procs[i].state != TERMINATED) return 0;
+    return 1;
+}
+
+void scheduler() {
+    int next = 0;
+
+    if (sigsetjmp(scheduler_ctx, 1) != 0) {
+        printf("<- timer interrupt, context switch\n\n");
+    }
+
+    while (!all_done()) {
+        int found = 0;
+        for (int i = 0; i < num_procs; i++) {
+            int idx = (next + i) % num_procs;
+            if (procs[idx].state == READY) {
+                next = idx;
+                found = 1;
+                break;
+            }
+        }
+        if (!found) break;
+
+        timer_expired = 0;
+        procs[next].state = RUNNING;
+        current = next;
+
+        printf("[%s] running", procs[next].name);
+        fflush(stdout);
+
+        while (!timer_expired && procs[next].state == RUNNING) {
+            do_work(next);
+            if (procs[next].state == RUNNING) {
+                printf(".");
+                fflush(stdout);
+            }
+        }
+
+        if (procs[next].state == TERMINATED)
+            printf(" done!\n\n");
+        
+        next = (next + 1) % num_procs;
+    }
+}
+
