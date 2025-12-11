@@ -79,5 +79,14 @@ void print_status() {
 }
 
 void do_work(int pid) {
-    // TODO
+    volatile long c = 0;
+    while (c < 50000000 && !timer_expired) c++;
+
+    if (!timer_expired) {
+        procs[pid].work_done++;
+
+        if (procs[pid].work_done >= procs[pid].work_total) {
+            procs[pid].state = TERMINATED;
+        }
+    }
 }
