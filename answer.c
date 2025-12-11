@@ -50,6 +50,11 @@ void setup_timer() {
     setitimer(ITIMER_REAL, &timer, NULL);
 }
 
+void stop_timer() {
+    struct itimerval timer = {0};
+    setitimer(ITIMER_REAL, &timer, NULL);
+}
+
 void init_process() {
     struct { char* name; int work; } init[] = {
         {"Calculator", 3},
@@ -73,7 +78,7 @@ void print_status() {
     printf("---  ----------  ----------  --------\n");
     for (int i = 0; i < num_procs; i++) {
         const char *st = procs[i].state == READY ? "READY" : procs[i].state == RUNNING ? "RUNNING" : "DONE";
-        printf("  %d    %-10s  %-10s  %d/%d\n", procs[i].pid, procs[i].name, st, procs[i].work_done, procs[i].work_total);
+        printf("%d    %-10s  %-10s  %d/%d\n", procs[i].pid, procs[i].name, st, procs[i].work_done, procs[i].work_total);
     }
     printf("\n");
 }
@@ -101,7 +106,7 @@ void scheduler() {
     int next = 0;
 
     if (sigsetjmp(scheduler_ctx, 1) != 0) {
-        printf("<- timer interrupt, context switch\n\n");
+        printf("  <- timer interrupt, context switch\n\n");
     }
 
     while (!all_done()) {
@@ -138,3 +143,20 @@ void scheduler() {
     }
 }
 
+int main() {
+    printf("\nTime Sharing Simulation (quantum=%dms)\n\n", TIME_QUANTUM_MS);
+
+    init_process();
+    printf("Initial state:\n");
+    print_status();
+
+    setup_timer();
+    scheduler();
+    stop_timer();
+
+    printf("Final state:\n");
+    print_status();
+    printf("Total context switches: %d\n", switches);
+
+    return 0;
+}
