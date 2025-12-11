@@ -12,7 +12,14 @@ int current_task = 0;
 pid_t tasks[NUM_TASK];
 
 void timer_handler();
-void run_task(int task_id);
+
+void run_task(int task_id) {
+    int counter = 0;
+    while(1) {
+        printf("[Task %d] Counter: %d\n", task_id, counter++);
+        sleep(1);
+    }
+}
 
 int main() {
     printf("Time-Sharing System Simulation\n\n");
@@ -31,6 +38,7 @@ int main() {
                 kill(tasks[i], SIGSTOP);
         }
     }
+
 
     return 0;
 }
