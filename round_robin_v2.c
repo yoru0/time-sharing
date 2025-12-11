@@ -11,8 +11,17 @@
 int current_task = 0;
 pid_t tasks[NUM_TASK];
 
-void timer_handler();
+// signal handler for timer interrupt
+void timer_handler() {
+    printf("\n[Scheduler] Time slice expired. Switching tasks...\n");
 
+    kill(tasks[current_task], SIGSTOP);
+    current_task = (current_task + 1) % NUM_TASK;
+    kill(tasks[current_task], SIGCONT);
+    alarm(TIME_SLICE);
+}
+
+// task function
 void run_task(int task_id) {
     int counter = 0;
     while(1) {
@@ -38,7 +47,7 @@ int main() {
                 kill(tasks[i], SIGSTOP);
         }
     }
-
+    
 
     return 0;
 }
