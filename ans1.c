@@ -28,7 +28,7 @@ int current = 0;
 int finished = 0;
 int clock_time = 0;
 
-void scheduler(int sig) {
+void scheduler() {
     clock_time += TIME_QUANTUM;
 
     // Update current running process
