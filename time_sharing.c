@@ -1,8 +1,3 @@
-/*
- * Time-Sharing System Simulation using Signals and Timers
- * Compact Round-Robin Scheduling Implementation
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -31,7 +26,6 @@ int clock_time = 0;
 void scheduler() {
     clock_time += TIME_QUANTUM;
 
-    // Update current running process
     if (processes[current].state == RUNNING) {
         processes[current].remaining_time -= TIME_QUANTUM;
 
@@ -43,12 +37,10 @@ void scheduler() {
             printf("Process %d completed at time %d\n", processes[current].pid, clock_time);
 
             if (finished >= NUM_PROCESSES) {
-                printf("\n--- Final Results ---\n");
+                printf("\nFinal Results:\n");
                 float avg_wait = 0, avg_turn = 0;
                 for (int i = 0; i < NUM_PROCESSES; i++) {
-                    printf("P%d: Burst=%d, Waiting=%d, Turnaround=%d\n",
-                           processes[i].pid, processes[i].burst_time,
-                           processes[i].waiting_time, processes[i].turnaround_time);
+                    printf("P%d: Burst Time = %d, Waiting Time = %d, Turnaround Time = %d\n", processes[i].pid, processes[i].burst_time, processes[i].waiting_time, processes[i].turnaround_time);
                     avg_wait += processes[i].waiting_time;
                     avg_turn += processes[i].turnaround_time;
                 }
@@ -60,7 +52,6 @@ void scheduler() {
         processes[current].state = READY;
     }
 
-    // Find next ready process (Round-Robin)
     int start = current;
     do {
         current = (current + 1) % NUM_PROCESSES;
@@ -73,8 +64,7 @@ void scheduler() {
 }
 
 int main() {
-    printf("=== Time-Sharing System (Round-Robin) ===\n");
-    printf("Time Quantum: %d seconds\n\n", TIME_QUANTUM);
+    printf("Round-Robin Time-Sharing System (q: %d seconds)\n", TIME_QUANTUM);
 
     // Initialize processes
     int burst_times[] = {8, 6, 4, 10};
